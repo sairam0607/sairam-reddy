@@ -1,0 +1,512 @@
+radialsvmtune<-train(x=train[,-1],y=train[,1],method="svmRadial",
+metric="Accuracy",tuneGrid=grid1,trcontrol=ctrl)
+radialsvmtune<-train(x=train[,-1],y=train[,1],method="svmRadial",
+,tuneGrid=grid1,trcontrol=ctrl)
+radialsvmtune<-train(x=train[,-1],y=train[,1],method="svmRadial",
+tuneGrid=grid1,trcontrol=ctrl)
+grid2=expand.grid(C=10^(-4:1),sigma=10^(-4:1))
+radialsvmtune<-train(traindata[,-1], traindata[,1],
+method = "svmRadial",
+tuneGrid = grid2,
+trControl = ctrl)
+radialsvmtune<-train(train[,-1], train[,1],
+method = "svmRadial",
+tuneGrid = grid2,
+trControl = ctrl)
+plogis(linearsvmtune)
+plot(linearsvmtune)
+plot(radialsvmtune)
+svm<-resamples(list(linearsvmtune,radialsvmtune))
+summary(svm)
+svm
+bwplot(svm,metric = "Accuracy",ylab=c("linear kernel","radial kernel"))
+prediction<-predict(radialsvmtune,test[,-1])
+table(prediction,test[,1])
+x<-table(prediction,test[,1])
+acc<-aum(diag(x))/sum(x)
+acc<-sum(diag(x))/sum(x)
+acc
+rm(list = ls(all=TRUE))
+data(cats)
+summary(cats)
+library(caret)
+transformation<-preProcess(cats[,-1],method = c("range","centre"))
+transformation<-preProcess(cats[,-1],method = c("range"))
+train_rows<-createDataPartition(cats$Sex,p=0.85,list = F)
+train<-cats[train_rows,]
+test<-cats[-train_rows,]
+glm_cats<-glm(cats$Sex~.,family = "binomial",data=cats)
+summary(glm_cats)
+stepAIC(glm_cats)
+glm_cats<-glm(cats$Sex~.,family = "binomial",data=train)
+train_rows<-createDataPartition(cats$Sex,p=0.85,list = F)
+train<-cats[train_rows,]
+test<-cats[-train_rows,]
+glm_cats<-glm(cats$Sex~.,family = "binomial",data=train)
+train_rows<-createDataPartition(cats,p=0.85,list = F)
+train<-cats[train_rows,]
+test<-cats[-train_rows,]
+glm_cats<-glm(cats$Sex~.,family = "binomial",data=train)
+glm_cats<-glm(sex~.,family = "binomail",data = train)
+glm_cats<-glm(sex~.,family = "binomail",data = train)
+glm_cats<-glm(sex~.,family = "binomial",data = train)
+names(train)
+glm_cats<-glm(Sex~.,family = "binomial",data = train)
+summary(glm_cats)
+stepAIC(glm_cats)
+prob_train<-predict(glm_cats,type="response")
+library(ROCR)
+pred<-prediction(prob_train,train$Sex)
+pred
+pref<-performance(pred,measure = "tpr",x.measure = "fpr")
+pref<-performance(pred,"tpr","fpr")
+prob_test<-predict(glm_cats,test,type="response")
+pred_test<-ifelse(prob_test>0.1,"male","female")
+confusionMatrix<-table(test$Sex,pred_test)
+confusionMatrix
+prob_train
+table(prob_test,test$Sex)
+summary(prob_train)
+prob_train
+prob_test<-predict(glm_cats,test,type="response")
+pred_test<-ifelse(prob_test>0.1,"male","female")
+table(prob_test,test$Sex)
+prob_train
+confusionMatrix<-table(test$Sex,pred_test)
+confusionMatrix
+table(pred_test,test$Sex)
+pred_test
+test$Sex
+pred_test<-ifelse(prob_test>0.1,"M","F")
+pred_test
+table(pred_test,test$Sex)
+prob_train
+confusionMatrix<-table(test$Sex,pred_test)
+confusionMatrix
+table(pred_test)
+table(cats$Sex)
+train_rows<-createDataPartition(cats,p=0.70,list = F)
+train<-cats[train_rows,]
+test<-cats[-train_rows,]
+names(train)
+glm_cats<-glm(Sex~.,family = "binomial",data = train)
+summary(glm_cats)
+stepAIC(glm_cats)
+prob_train<-predict(glm_cats,type="response")
+prob_train
+library(ROCR)
+pred<-prediction(prob_train,train$Sex)
+pred
+prob_test<-predict(glm_cats,test,type="response")
+pred_test<-ifelse(prob_test>0.1,"M","F")
+pred_test
+table(pred_test,test$Sex)
+prob_train
+confusionMatrix<-table(test$Sex,pred_test)
+confusionMatrix
+test$Sex
+table(pred_test)
+table(cats$Sex)
+table
+train_rows<-createDataPartition(cats,p=0.5,list = F)
+train<-cats[train_rows,]
+test<-cats[-train_rows,]
+names(train)
+glm_cats<-glm(Sex~.,family = "binomial",data = train)
+summary(glm_cats)
+stepAIC(glm_cats)
+prob_train<-predict(glm_cats,type="response")
+prob_train
+library(ROCR)
+pred<-prediction(prob_train,train$Sex)
+pred
+prob_test<-predict(glm_cats,test,type="response")
+pred_test<-ifelse(prob_test>0.1,"M","F")
+pred_test
+table(pred_test,test$Sex)
+prob_train
+confusionMatrix<-table(test$Sex,pred_test)
+confusionMatrix
+test$Sex
+varImpPlot(model_RF)
+rm(list = ls(all=TRUE))
+data(iris3)
+summary(iris3)
+str(iris3)
+data(iris)
+summary(iris)
+str(iris)
+iris1<-iris[,-5]
+preprocess<-preprocess(iris1,method=c("center","scale"))
+library(caret)
+preprocess<-preprocess(iris1,method=c("center","scale"))
+preprocess<-preprocess(iris1,method=c("center","scale"))
+preprocess<-preProcess(iris1,method=c("center","scale"))
+mydata<-predict(preprocess,iris1)
+target<-iris$Species
+new_data<-rbind(mydata,target)
+str(new_data)
+rm(list = ls(all=TRUE))
+data(iris)
+summary(iris)
+str(iris)
+target<-iris$Species
+iris<-subset(iris,select = -c(5))
+iris
+str(iris)
+library(caret)
+pre<-preProcess(iris,method = c("center","scale"))
+mydata<-predict(pre,iris)
+str(mydata)
+new_data<-rbind(mydata,pre)
+rm(list = ls(all=TRUE))
+data(iris)
+summary(iris)
+str(iris)
+##### now preprocessing the data
+target<-iris$Species
+subset<-iris[,-5]
+library(caret)
+preProcess<-preProcess(subset,method = c("center","scale"))
+mydata<-predict(preProcess,subset)
+dim(mydata)
+my_data<-cbind(mydata,target)
+dim(my_data)
+train_rows<-createDataPartition(my_data$target,p=0.7,list = F)
+train<-my_data[train_rows,]
+test<-my_data[-train_rows,]
+plot(iris)
+hist(iris)
+hist(iris[,-5])
+scatterplot(iris)
+library(scatterplot)
+install.packages("scatterplot")
+lm<-lm(train$target~.,data = train)
+summary(lm)
+glm<-glm(train$target~.,family = "binomial",data = train)
+summary(glm)
+glm<-glm(train$target~.,family = "binomial",data = train,type="response")
+predict_glm<-predict(glm,test$target)
+predict_glm<-predict(glm,test)
+predict_glm
+table(predict_glm,test$target)
+confusionMatrix(predict_glm,test$target)
+confusionMatrix(predict_glm,test)
+predict_glm<-predict(glm,test,type = "response")
+predict_glm<-predict(glm,test$target,type = "response")
+predict_glm<-predict(glm,test,type = "response")
+predict_glm
+table(predict_glm,test$target)
+confusionMatrix(predict_glm,test)
+confusionMatrix(predict_glm,test$target)
+rm(list = ls(all=TRUE))
+install.packages("lpsolve")
+install.packages("lpSolve")
+library(lpSolve)
+f.const= rbind(c(2,1),
+c(1,1).
+c(1,0),
+c(0,1))
+f.const= rbind(c(2,1),
+c(1,1),
+c(1,0),
+c(0,1))
+f.rhs = c(320,240,0,0)
+lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+f.dir = "max"
+lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+f.obj=c(40,30)
+lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+f.const= rbind(c(2,1),
+c(1,1),
+c(1,0),
+c(0,1))
+f.sign = c("<=","<=",">=",">=")
+f.rhs = c(320,240,0,0)
+f.dir = "max"
+lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+optimiztion_model = lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+optimiztion_model
+optimiztion_model$solution
+lp(f.dir, f.obj, f.const, f.sign, f.rhs, int.vec = c(1:2))
+f.dir = "min"
+optimiztion_model = lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+optimiztion_model$solution
+lp(f.dir, f.obj, f.const, f.sign, f.rhs, int.vec = c(1:2))
+f.dir = "max"
+optimiztion_model = lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+optimiztion_model$solution
+#### for getting the integer values
+lp(f.dir, f.obj, f.const, f.sign, f.rhs, int.vec = c(1:2))
+f.obj = c(200,150)
+f.const = rbind(c(2,1),
+c(7,8),
+c(1,0),
+c(0,1))
+f.sign = c("<=","<=",">=",">=")
+f.rhs = c(200,150,0,0)
+f.dir - "max"
+f.dir = "max"
+optimiztion_model = lp(f.dir, f.obj, f.const, f.sign, f.rhs)
+optimiztion_model
+lp(f.dir, f.obj, f.const, f.sign, f.rhs, int.vec = c(1:2))
+lp("max",f.obj,f.con,f.dir,f.rhs,int.vec = 1:2)
+f.obj = c(5,12)
+f.con = matrix(c(20,10,10,12,5,30), nrow=3, byrows=TRUE)
+f.dir = c("<=","<=","<=")
+f.rhs = c(200,120,150)
+lp("max",f.obj,f.con,f.dir,f.rhs,int.vec = 1:2)
+lp("max",f.obj, f.con,f.dir,f.rhs,int.vec = 1:2)
+f.con = matrix(c(20,10,10,12,5,30), nrow=3, byrows=TRUE)
+f.con = matrix(c(20,10,10,12,5,30,1,0,0,1), nrow=3, byrows=TRUE)
+f.con = matrix(c(20,10,10,12,5,30,1,0,0,1), nrow=3, byrow=TRUE)
+f.con = matrix(c(20,10,10,12,5,30,1,0,0,1), nrow=3, byrow=TRUE)
+f.dir = c("<=","<=","<=")
+f.rhs = c(200,120,150)
+lp("max",f.obj, f.con,f.dir,f.rhs,int.vec = 1:2)
+lp("max",f.obj, f.con,f.dir,f.rhs,int.vec = 1:2)
+rm(list = la(all=TRUE))
+rm(list = ls(all=TRUE))
+x = sample(1:7, size = 1, replace = TRUE)
+x
+x
+y= samle(1:7, size, replace= TRUE)
+y= samle(1:7, size=1, replace= TRUE)
+y= sample(1:7, size=1, replace= TRUE)
+y
+y
+rm(list = ls(all=TRUE))
+x = sample(1:7, size = 1, replace = TRUE)
+x
+y= sample(1:7, size=1, replace= TRUE)
+y
+number_of_simulation =1000
+cnt =0
+for (i in 1:number_of_simulation)
+number_of_simulation =1000
+cnt =0
+for (i in 1:number_of_simulation){
+x = sample(1:7, size = 1, replace = TRUE);x
+y= sample(1:7, size=1, replace= TRUE);y
+if (x==y){
+cnt = cnt+1
+}
+}
+prob = cnt/number_of_simulation
+prob
+number_of_simulation =1000
+cnt =0
+for (i in 10:number_of_simulation){
+x = sample(1:7, size = 1, replace = TRUE);x
+y= sample(1:7, size=1, replace= TRUE);y
+if (x==y){
+cnt = cnt+1
+}
+}
+prob = cnt/number_of_simulation
+prob
+number_of_simulation =1000
+cnt =0
+for (i in 100:number_of_simulation){
+x = sample(1:7, size = 1, replace = TRUE);x
+y= sample(1:7, size=1, replace= TRUE);y
+if (x==y){
+cnt = cnt+1
+}
+}
+prob = cnt/number_of_simulation
+prob
+number_of_simulation =1000
+cnt =0
+for (i in 500:number_of_simulation){
+x = sample(1:7, size = 1, replace = TRUE);x
+y= sample(1:7, size=1, replace= TRUE);y
+if (x==y){
+cnt = cnt+1
+}
+}
+prob = cnt/number_of_simulation
+prob
+number_of_simulation =1000
+cnt =0
+for (i in 1000:number_of_simulation){
+x = sample(1:7, size = 1, replace = TRUE);x
+y= sample(1:7, size=1, replace= TRUE);y
+if (x==y){
+cnt = cnt+1
+}
+}
+prob = cnt/number_of_simulation
+prob
+number_of_simulation =10000
+cnt =0
+for (i in 1000:number_of_simulation){
+x = sample(1:7, size = 1, replace = TRUE);x
+y= sample(1:7, size=1, replace= TRUE);y
+if (x==y){
+cnt = cnt+1
+}
+}
+prob = cnt/number_of_simulation
+prob
+number_of_simulations =c(10,100,500,1000,10000)
+for ( i in number_of_simulations)
+{
+cnt= 0
+for(j in 1:i)
+{
+w = sample(1:7,size = 1,replace = TRUE)
+X = sample(1:7,size = 1, replace = TRUE)
+if(identical(w,x)===TRUE)
+cnt = cnt+1
+}
+prob = cnt/i
+print(paste(i,prob,sep = "="))
+}
+number_of_simulations =c(10,100,500,1000,10000)
+for ( i in number_of_simulations)
+{
+cnt= 0
+for(j in 1:i)
+{
+w = sample(1:7,size = 1,replace = TRUE)
+X = sample(1:7,size = 1, replace = TRUE)
+if(identical(w,x)===TRUE)
+if(identical(w,x)==TRUE)
+cnt = cnt+1
+w = sample(1:7,size = 1,replace = TRUE)
+X = sample(1:7,size = 1, replace = TRUE)
+if(identical(w,x)==TRUE)
+cnt = cnt+1
+}
+prob = cnt/i
+print(paste(i,prob,sep = "="))
+}
+number_of_simulations =c(10,100,500,1000,10000)
+for ( i in number_of_simulations)
+{
+cnt= 0
+for(j in 1:i)
+{
+w = sample(1:7,size = 1,replace = TRUE)
+X = sample(1:7,size = 1, replace = TRUE)
+if(identical(w,x)==TRUE)
+cnt = cnt+1
+}
+prob = cnt/i
+print(paste(i,prob,sep = "="))
+}
+rm(list=ls(all=TRUE))
+timeNeeded= function(numSims) {
+time=0
+set.seed(1244)
+for (i in 1:numSims) {
+partOrFull=runif(1,0,1)
+rm(list=ls(all=TRUE))
+source('C:/Piazza/251117/lab/20171125_Batch31_CSE7321c_MS_projmgmtRcode.R', echo=TRUE)
+rm(list=ls(all=TRUE))
+timeNeeded= function(numSims) {
+time=0
+set.seed(1244)
+for (i in 1:numSims) {
+partOrFull=runif(1,0,1)
+# 90-10 probability for full and part
+if (partOrFull<=0.1){
+# part project is possible as per probability
+totalModules=sample(10:12, 1)
+}else{
+# full project is possible as per probability
+totalModules=sample(20:24, 1)
+}
+#Two vectors are created randomly to represent tasks and people per module
+tasksPerModule=sample(50:100, totalModules,replace=T)
+totalTasks=sum(tasksPerModule)
+#Compute the time for all tasks.  Each task can take anywhere between 5 to 10 hours
+timeToDoTasks=sum(sample(5:10,totalTasks,replace=TRUE))
+Resourcesperproject=sum(sample(3:7, totalModules,replace=T)) # Resources
+#Time needed according to this simulation
+time[i]=timeToDoTasks/Resourcesperproject
+}
+#The time vector is returned
+cat("Time Needed based on", numSims, "simulations= ", mean(time), "\n")
+return(mean(time))
+}
+simulations=c(10,100,1000,10000,50000,100000)
+# par(mfrow=c(1,3))
+start = Sys.time()
+for (i in simulations) {
+Time=timeNeeded(i)
+#print(Time)
+#cat("Time Needed based on", i, "simulations= ", Time, "\n")
+}
+end=Sys.time()-start
+end
+start1 = Sys.time()
+time1 = sapply(simulations,timeNeeded)
+end1=Sys.time()-start1
+end1
+plot(end1)
+rm(list = ls())
+rm(list=ls())
+setwd("C:/Piazza/analytics vidhya/Data hack")
+train = read.csv("train_jDb5RBj.csv")
+View((train))
+colnames(train)
+test = read.csv("test_dan2xFI.csv")
+id<-test$ID
+summary(train)
+str(train)
+train$ID = NULL
+train$ Purchase = as.factor(train$Purchase)
+test$ID = NULL
+sum(is.na(train))
+sum(is.na(test))
+colnames(test)
+levels(train$Purchase)
+boxplot(train$MOSTYPE)
+apply(train, 2, sd)
+library('gbm')
+boosting <- gbm(class~.,data= train, distribution = "gaussian",shrinkage = 0.01,
+n.trees = 1000,interaction.depth = 4)
+library('gbm')
+boosting <- gbm(Purchase~.,data= train, distribution = "gaussian",shrinkage = 0.01,
+n.trees = 1000,interaction.depth = 4)
+boosting
+summary(boosting)
+boosting_pred <- predict(boosting,test,n.trees = 100)
+boosting_pred
+confusionMatrix(boosting_pred,test1)
+submission_gbm = c(id, boosting_pred)
+names(submission_gbm) = c("ID", "Purchase")
+write.csv(submission_gbm,"sub_gbm.csv", row.names = F)
+submission_gbm = c(id, boosting_pred)
+View(submission_gbm)
+id<-as.data.frame(id)
+submission<-cbind(id,predict)
+id<-as.data.frame(id)
+submission<-cbind(id,predict)
+submission<-cbind(id,boosting_pred)
+submission<-as.data.frame(submission)
+names(submission)<-c("ID","Purchase")
+write.csv(submission, "sub_gbm.csv", row.names = F)
+boosting_pred <- predict(boosting,test,n.trees = 100, type = "response")
+boosting_pred
+id<-as.data.frame(id)
+submission<-cbind(id,boosting_pred)
+submission<-as.data.frame(submission)
+names(submission)<-c("ID","Purchase")
+write.csv(submission, "sub_gbm.csv", row.names = F)
+boosting_pred <- predict(boosting,test,n.trees = 100, type = "response")
+boosting_pred
+id<-as.data.frame(id)
+submission1<-cbind(id,boosting_pred)
+submission1<-as.data.frame(submission)
+names(submission1)<-c("ID","Purchase")
+write.csv(submission, "sub_gbm1.csv", row.names = F)
+submission1<-cbind(id,boosting_pred, type = "response")
+submission1<-as.data.frame(submission)
+names(submission1)<-c("ID","Purchase")
+write.csv(submission, "sub_gbm1.csv", row.names = F)
+predict7<-ifelse(submission1<0.5,0,1)
+names(submission1)<-c("ID","Purchase")
+write.csv(submission, "sub_gbm7.csv", row.names = F)
