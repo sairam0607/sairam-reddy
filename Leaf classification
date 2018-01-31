@@ -1,0 +1,250 @@
+
+# coding: utf-8
+
+# In[14]:
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
+import pandas_profiling
+
+
+# In[15]:
+
+def warn(*args, **kwargs): pass
+import warnings
+warnings.warn = warn
+
+
+# In[16]:
+
+from sklearn.preprocessing import LabelEncoder
+from sklearn.cross_validation import StratifiedShuffleSplit
+
+
+# In[17]:
+
+train = pd.read_csv("C:\\Piazza\\kaggle\\leaf classifiction\\train.csv")
+test = pd.read_csv("C:\\Piazza\\kaggle\\leaf classifiction\\test.csv")
+
+
+# In[18]:
+
+pandas_profiling.ProfileReport(train)
+
+
+# In[19]:
+
+train = pd.read_csv("C:\\Piazza\\kaggle\\leaf classifiction\\train.csv")
+test = pd.read_csv("C:\\Piazza\\kaggle\\leaf classifiction\\test.csv")
+
+
+# In[20]:
+
+def encode(train, test):
+    le = LabelEncoder().fit(train.species)
+    label = le.transform(train.species)
+    classes = list(le.classes_)
+    test_ids = test.id
+    train = train.drop(['species','id'], axis = 1)
+    test = test.drop(['id'], axis=1)
+    return train, label, test, test_ids, classes
+
+
+# In[21]:
+
+train, label, test, test_ids, classes = encode(train,test)
+
+
+# In[35]:
+
+train.head(7)
+
+
+# In[36]:
+
+sss = StratifiedShuffleSplit(label, 10, test_size = 0.2, random_state= 2365)
+for  train_index, test_index in sss:
+    x_train, x_test = train.values[train_index], train.values[train_index]
+    y_train, y_test = label[train_index], label[train_index]
+
+
+# In[38]:
+
+from sklearn.metrics import accuracy_score, log_loss
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC, LinearSVC, NuSVC
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, GradientBoostingClassifier
+from sklearn.naive_bayes import GaussianNB
+from sklearn.discriminant_analysis import LinearDiscriminantAnalysis
+from sklearn.discriminant_analysis import QuadraticDiscriminantAnalysis
+
+
+# In[40]:
+
+classifier = [
+    KNeighborsClassifier(3),
+    SVC(kernel="rbf", C=0.025, probability=True),
+    NuSVC(probability = True),
+    DecisionTreeClassifier(),
+    RandomForestClassifier(),
+    AdaBoostClassifier(),
+    GradientBoostingClassifier(),
+    GaussianNB(),
+    LinearDiscriminantAnalysis(),
+    QuadraticDiscriminantAnalysis()]
+
+
+# In[43]:
+
+log_cols = ["classifier", "Accuracy", "Log_Loss"]
+log = pd.DataFrame(columns = log_cols)
+
+
+# In[46]:
+
+for clf in classifier:
+    clf.fit(x_train, y_train)
+    name = clf.__class__.__name__
+    print("="*30)
+    print(name)
+    print('***Result***')
+    train_predictions = clf.predict(x_test)
+    acc = accuracy_score(y_test, train_predictions)
+    print("Accuracy: {:.4%}".format(acc))
+    
+    train_predictions = clf.predict_proba(x_test)
+    l1 = log_loss(y_test, train_predictions)
+    print("Log Loss: {}".format(l1))
+    
+    log_entry = pd.DataFrame([[name, acc*100,1]], columns = log_cols)
+    log = log.append(log_entry)
+    
+    print("="*30)
+
+
+# In[58]:
+
+#predict = pd.DataFrame(train_predictions, axis =1)
+#predict.head()
+#p.to_csv("C:\\Piazza\\internship\\CSMD\\newdata.csv")
+
+
+# In[27]:
+
+train.columns
+#test.columns
+train.describe()
+
+
+# In[28]:
+
+train.describe()
+#test.describe()
+
+
+# In[29]:
+
+train.shape
+test.shape
+
+
+# In[30]:
+
+train.head()
+
+
+# In[31]:
+
+train.shape
+test.shape
+print(train.shape,test.shape)
+
+
+# In[32]:
+
+corr = train.corr()
+sns.heatmap(corr, mask=np.zeros_like(corr, dtype=np.bool), cmap=sns.diverging_palette(220, 10, as_cmap=True),
+            square=True)
+plt.show()
+
+
+# In[33]:
+
+sns.boxplot(data = train.margin1)
+plt.show()
+sns.boxplot(data = train.texture1)
+plt.show()
+
+
+# In[34]:
+
+sns.countplot(x=train.margin1, data = train)
+plt.show()
+
+
+# In[28]:
+
+del train['id']
+
+
+# In[29]:
+
+del test['id']
+
+
+# In[31]:
+
+train.head()
+test.head()
+
+
+# In[50]:
+
+X_train = pd.DataFrame (train.iloc[:,1:])
+Y_train = pd.DataFrame (train.iloc[:,0])
+X_train.head()
+Y_train.describe()
+#X_test = pd.DataFrame (test.iloc[:,1:])
+#Y_test = pd.DataFrame(test.iloc[:,0])
+
+
+# In[52]:
+
+from sklearn import datasets
+from sklearn.feature_selection import RFE
+from sklearn.linear_model import LogisticRegression
+logreg = LogisticRegression()
+
+
+# In[55]:
+
+logreg.fit(x_train, y_train)
+
+
+# In[ ]:
+
+
+
+
+# In[45]:
+
+#from sklearn import preprocessing
+#minmaxscaler = preprocessing.MinMaxScaler()
+#scaled = minmaxscaler.fit_transform(X_train)
+#data = pd.DataFrame(scaled)
+#scaled = minmaxscaler.fit_transform(test)
+#data = pd.DataFrame(scaled)
+
+
+# In[46]:
+
+#data.head()
+
+
+# In[ ]:
+
+
+
