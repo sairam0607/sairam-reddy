@@ -1,0 +1,409 @@
+## clearing the environment
+rm(list = ls(all = TRUE))
+
+## set the working directory
+## we have two floders train and test 
+
+setwd("C:/Piazza/PHD/20180120_PHD_Batch31_Classification_Patterns_ForStudents/TrainData")
+
+## reading the data from working directory 
+## reading different files
+
+Train = read.csv("Train.csv")
+Train_Account = read.csv("Train_AccountInfo.csv")
+Train_Demo = read.csv("Train_Demographics.csv")
+names(Train_Demo)[1] = c("HouseholdID")
+
+Train_Service = read.csv("Train_ServicesOptedFor.csv")
+
+## Merging the train files based upon customer ids  
+
+Data = merge(Train,Train_Account, by = "CustomerID")
+library(dplyr)
+require(reshape2)
+
+## with the help of dcast it will do the wide and length
+
+Data2 = dcast(Train_Service, CustomerID ~ TypeOfService)
+Data3 = merge(Data,Data2, by.x = "CustomerID")
+train = merge(Data3, Train_Demo, by.x = "CustomerID", by.y = "HouseholdID")
+
+## checking of summary  and structure  of data
+
+summary(train)
+str(train)
+
+
+### for reading the test data
+
+setwd("C:/Piazza/PHD/20180120_PHD_Batch31_Classification_Patterns_ForStudents/TestData")
+
+## reading the test files 
+Test = read.csv("Test.csv")
+Test_Account = read.csv("Test_AccountInfo.csv")
+Test_Demo = read.csv("Test_Demographics.csv")
+names(Test_Demo)[1] = c("HouseholdID")
+Test_Service = read.csv("Test_ServicesOptedFor.csv")
+
+## Merged the test files Based upon the customer id.
+
+some = merge(Test,Test_Account, by = "CustomerID")
+library(dplyr)
+require(reshape2)
+some2 = dcast(Test_Service, CustomerID ~ TypeOfService)
+some3 = merge(some,some2, by.x = "CustomerID")
+test = merge(some3, Test_Demo, by.x = "CustomerID", by.y = "HouseholdID")
+
+
+## Just putting the train and test into data frames
+train = as.data.frame(train)
+test = as.data.frame(test)
+
+### summary of train and tets  data 
+summary(train)
+summary(test)
+
+
+## str of train and test data
+str(train)
+str(test)
+
+
+
+## we have to convert the numeric factore levels to numeric  for train and test data 
+train$TotalCharges = as.numeric(train$TotalCharges)
+test$TotalCharges = as.numeric(test$TotalCharges)
+
+
+## we have some ? and blanks in the variables we have to consider as NA values 
+
+levels(train$Country)[levels(train$Country)== "?"] = NA
+levels(train$State)[levels(train$State)== "?"] = NA
+levels(train$Education)[levels(train$Education)== ""] = NA
+levels(train$Gender)[levels(train$Gender)== ""] = NA
+
+
+## we doesnt have the ? in state for that i am not chaning any thing
+levels(test$Country)[levels(test$Country)== "?"] = NA
+levels(test$Education)[levels(test$Education)== ""] = NA
+levels(test$Gender)[levels(test$Gender)== ""] = NA
+
+
+## checking the Na values in the train  and test data 
+sum(is.na(train))
+sum(is.na(test))
+
+## imputation train and test
+library(DMwR)
+
+train = centralImputation(train)
+test = centralImputation(test)
+
+## we have the chr variables we have to convert the all variables to factors 
+
+train$DeviceProtection = as.factor(train$DeviceProtection)
+train$HasPhoneService = as.factor(train$HasPhoneService)
+train$InternetServiceCategory = as.factor(train$InternetServiceCategory)
+train$MultipleLines = as.factor(train$MultipleLines)
+train$OnlineBackup = as.factor(train$OnlineBackup)
+train$OnlineSecurity = as.factor(train$OnlineSecurity)
+train$StreamingMovies = as.factor(train$StreamingMovies)
+train$StreamingTelevision = as.factor(train$StreamingTelevision)
+train$TechnicalSupport = as.factor(train$TechnicalSupport)
+
+
+
+test$DeviceProtection = as.factor(test$DeviceProtection)
+test$HasPhoneService = as.factor(test$HasPhoneService)
+test$InternetServiceCategory = as.factor(test$InternetServiceCategory)
+test$MultipleLines = as.factor(test$MultipleLines)
+test$OnlineBackup = as.factor(test$OnlineBackup)
+test$OnlineSecurity = as.factor(test$OnlineSecurity)
+test$StreamingMovies = as.factor(test$StreamingMovies)
+test$StreamingTelevision = as.factor(test$StreamingTelevision)
+test$TechnicalSupport = as.factor(test$TechnicalSupport)
+
+## Final we have to check the structure of train and test
+
+str(train)
+str(test)
+
+## some int variables also we have to convert the factor
+## we have only two levels in the train and test variables.
+
+train$Retired = as.factor(train$Retired)
+train$HasPartner = as.factor(train$HasPartner)
+train$HasDependents = as.factor(train$HasDependents)
+
+test$Retired = as.factor(test$Retired)
+test$HasPartner = as.factor(test$HasPartner)
+test$HasDependents = as.factor(test$HasDependents)
+
+## removing the unique levels in the train and test data
+
+train$CustomerID = NULL
+train$DOC = NULL
+train$DOE = NULL
+train$Country = NULL
+train$State =NULL
+
+## For test Customer id we have to store into one data we have submit with CustomerID and Churn predictions
+CustomerID = test$CustomerID 
+CustomerID = as.data.frame(CustomerID)
+test$CustomerID = NULL
+test$DOC = NULL
+test$DOE =NULL
+test$Country =NULL
+test$State = NULL
+
+## In train payment Method has 4 levels, in test we have 3 levels for that we have to relevel it. 
+test$PaymentMethod = factor(test$PaymentMethod, levels = levels(train$PaymentMethod))
+table(test$PaymentMethod)
+
+
+
+## class imbalance i am using SMOTE over sample techinque. 
+
+table(train$Churn)
+library(caret)
+library(ROSE)
+train_imbalace = ovun.sample(Churn ~ ., data = train, method = "over",N = 7948)$data
+
+## this is for using this data for visualization in python
+## bar, box and correlation plot. in python it is colors visualization i took from python.
+
+write.csv(train_imbalace,"Churn.csv", row.names = F)
+
+
+
+## visualization 
+
+hist(x = train_imbalace$BaseCharges, col = "blue")
+hist(x = train_imbalace$TotalCharges, col = "blue")
+
+## for catagorical visualization
+num_data = train_imbalace[,2:3]
+num_data = as.data.frame(num_data)
+
+cat_data = train_imbalace
+cat_data$BaseCharges = NULL
+cat_data$TotalCharges = NULL
+
+library(ggplot2)
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = num_data$TotalCharges), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = ElectronicBilling), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = ContractType), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = PaymentMethod), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = DeviceProtection), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = HasPhoneService), position = "dodge")
+
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = InternetServiceCategory), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = MultipleLines), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = OnlineBackup), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = OnlineSecurity), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = StreamingMovies), position = "dodge")
+
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = StreamingTelevision), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = TechnicalSupport), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = Retired), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = HasPartner), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = HasDependents), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = Education), position = "dodge")
+ggplot(cat_data, aes(Churn, ..count..)) + geom_bar(aes(fill = Gender), position = "dodge")
+
+###### MOdel Bulding
+
+## Random Forest
+library(randomForest)
+model_rf = randomForest(Churn ~., data = train_imbalace, importance = TRUE, proximity = TRUE) 
+summary(model_rf)
+sum(is.na(train_imbalace))
+plot(model_rf)
+predict_rf = predict(model_rf, train_imbalace)
+confusionMatrix(train_imbalace$Churn, predict_rf, positive = "Yes")
+
+predict_test = predict(model_rf, test)
+
+Churn = predict_test
+sub = cbind(CustomerID, Churn)
+
+write.csv(sub, "predictions.csv", row.names = F)
+
+### Logistic model 
+
+model_glm = glm(Churn~., family = "binomial", data = train_imbalace)
+summary(model_glm)
+predict_glm = predict(model_glm, train_imbalace, type = "response")
+predict_glm
+predict_glm = ifelse(predict_glm>0.5,"Yes","No")
+predict_glm
+library(MLmetrics)
+library(caret)
+
+confusionMatrix(train_imbalace$Churn,predict_glm,positive = "Yes")
+Recall(train_imbalace$Churn,predict_glm,positive="Yes")
+predictions = predict(model_glm, test)
+predictions
+Churn = ifelse(predictions> 0.4, "Yes", "No")
+table(Churn)
+
+Churn = as.data.frame(Churn)
+
+submisssion = cbind(CustomerID, Churn)
+sub = as.data.frame(submisssion)
+write.csv(sub, "predictions.csv", row.names = F)
+
+
+library(ROCR)
+library(ggplot2)
+
+prob_train = predict(model_glm, type = "response")
+pred = prediction(prob_train, train_imbalace$Churn)
+perf = performance(pred, measure="tpr", x.measure="fpr")
+
+plot(perf, col=rainbow(10), colorize=T, print.cutoffs.at=seq(0,1,0.05), main = "ROC")
+perf_auc = performance(pred, measure="auc")
+auc =  perf_auc@y.values[[1]] 
+auc
+
+
+### svm model
+
+library(e1071)
+model_svm = svm(Churn~., data = train_imbalace)
+summary(model_svm)
+predict_svm = predict(model_svm, train_imbalace)
+
+confusionMatrix(train_imbalace$Churn,predict_svm,positive = "Yes")
+
+predict_test_svm = predict(model_svm, test)
+
+submisssion = cbind(CustomerID, predict_test_svm)
+names(submisssion)[2] = c("Churn")
+
+sub1 = as.data.frame(submisssion)
+
+write.csv(sub1, "predictions.csv", row.names = F)
+
+
+### rpart 
+library(rpart)
+library(rpart.plot)
+model_rpart = rpart(Churn~., data = train_imbalace)
+summary(model_rpart)
+predict_rpart = predict(model_rpart, train_imbalace)
+predict_rpart = ifelse(predict_rpart > 0.5 , "Yes", "No")
+
+confusionMatrix(train_imbalace$Churn,predict_rpart,positive = "Yes")
+
+
+
+###### c50 model
+library(C50)
+model_c50 = C5.0(x = train_imbalace[,-1], y=train_imbalace[,1], data =train_imbalace, rules = T)
+summary(model_c50)
+
+## naive bayes 
+
+library("e1071")
+library(mlbench)
+model_naiveBayes = naiveBayes(Churn~., data = train_imbalace)
+class(model_naiveBayes)
+summary(model_naiveBayes)
+print(model_naiveBayes)
+
+predict_nb = predict(model_naiveBayes, train_imbalace)
+
+confusionMatrix(train_imbalace$Churn, predict_nb, positive = "Yes")
+Recall(train_imbalace$Churn,predict_nb,positive="Yes")
+
+predict_nb_test = predict(model_naiveBayes,test)
+
+sub2 = cbind(CustomerID, predict_nb_test)
+names(submisssion)[2] = c("Churn")
+
+write.csv(sub2, "prediction.csv", row.names = F)
+
+## gbm
+library(caret)
+fitControl = trainControl(method = "cv",number = 5)
+
+tune_Grid =  expand.grid(interaction.depth = 2,
+                         n.trees = 500,
+                         shrinkage = 0.1,
+                         n.minobsinnode = 10)
+summary(tune_Grid)
+set.seed(100)
+fit = train(Churn ~ ., data = train_imbalace,
+            method = "gbm",
+            trControl = fitControl,
+            verbose = FALSE,
+            tuneGrid = tune_Grid)
+
+predict_gbm = predict(fit, train_imbalace)
+
+
+confusionMatrix(train_imbalace$Churn,predict_gbm,positive = "Yes")
+
+predict_gbm1 = predict(fit,test)
+
+submisssion = cbind(CustomerID, predict_gbm1)
+names(submisssion)[2] = c("Churn")
+sub_gbm = as.data.frame(submisssion)
+write.csv(sub_gbm, "predictions.csv", row.names = F)
+
+
+
+
+## ### XGboost
+library(xgboost)
+library(readr)
+library(stringr)
+library(caret)
+library(car)
+
+xgb = xgboost(data = data.matrix(train_imbalace[,-1]), 
+              label = train_imbalace$Churn, 
+              eta = 0.1,
+              max_depth = 15, 
+              nround=25, 
+              subsample = 0.5,
+              colsample_bytree = 0.5,
+              seed = 1,
+              eval_metric = "merror",
+              objective = "multi:softprob",
+              num_class = 12,
+              nthread = 3)
+summary(xgb)
+predict_xgb = predict(xgb, data.matrix(train_imbalace))
+predict_xgb = ifelse(predict_xgb>0.5 , "Yes", "No")
+
+
+
+confusionMatrix(train_imbalace$Churn,predict_xgb,positive = "Yes")
+Recall(train_imbalace$Churn,predict_xgb,positive="Yes")
+
+predict_xgb = predict(xgb, data.matrix(test))
+predict_xgb = ifelse(predict_xgb > 0.5 ,"Yes", "No")
+#confusionMatrix(train_imbalace$Churn, predict_xgb, positive = "Yes")
+
+
+submisssion = cbind(CustomerID, predict_xgb)
+sub = as.data.frame(submisssion)
+names(sub)[2] = c("Churn")
+head(sub)
+write.csv(sub, "predictions.csv", row.names = F)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
